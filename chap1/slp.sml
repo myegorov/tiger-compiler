@@ -126,3 +126,76 @@ fun interp (s:stm):unit =
   in
     ()
   end
+
+(* ex.1.1 *)
+type key = string
+datatype tree = LEAF | TREE of tree * key * tree
+
+val empty = LEAF
+
+fun insert (k, LEAF) = TREE (LEAF, k, LEAF)
+  | insert (k, t as TREE (l,k',r)) =
+      if k < k'
+        then TREE (insert (k, l), k', r)
+      else if k > k'
+        then TREE (l,k',insert(k,r))
+      else t
+
+fun member (t,k) =
+  case t of
+       LEAF => false
+     | TREE (l, k', r) =>
+         if k = k'
+           then true
+         else if k < k'
+           then member (l, k)
+         else member (r, k)
+
+(* val t = *)
+(*   insert("t", *)
+(*     insert("s", *)
+(*       insert("b", *)
+(*         insert("f", *)
+(*           insert("p", *)
+(*             insert("i", *)
+(*               insert("p", *)
+(*                 insert("s", *)
+(*                   insert ("t", *)
+(*                     empty))))))))); *)
+(* val t' = *)
+(*   insert("i", *)
+(*     insert("h", *)
+(*       insert("g", *)
+(*         insert("f", *)
+(*           insert("e", *)
+(*             insert("d", *)
+(*               insert("c", *)
+(*                 insert("b", *)
+(*                   insert ("a", *)
+(*                     empty))))))))); *)
+
+
+
+(* member ("a", t); *)
+(* member ("t", t); *)
+
+
+datatype 'a treee = E | T of 'a treee * (key * 'a) * 'a treee
+
+fun insertt (E, k, v) = T (E,(k,v), E)
+  | insertt (T (l,n as (k',_),r), k, v) =
+      if k < k'
+        then T (insertt (l, k, v), n, r)
+      else if k > k'
+        then T (l,n,insertt(r,k,v))
+      else T (l,(k,v),r)
+
+fun lookup (t, k) =
+  case t of
+       E => raise Fail ("key " ^ k ^ " does not exit")
+     | T (l, n as (k',v), r) =>
+         if k = k'
+           then v
+         else if k < k'
+           then lookup (l, k)
+         else lookup (r, k)
